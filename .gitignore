@@ -1,0 +1,22 @@
+#.gitignore
+.DS_Store
+.idea/
+.env_docker
+.pytest_cache/
+
+
+build/
+cython/
+
+# Файлы Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+venv/
+
+.python-version
+
+database.sql
+.env
