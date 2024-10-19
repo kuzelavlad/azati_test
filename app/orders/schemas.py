@@ -12,3 +12,11 @@ class OrderCreate(SQLModel):
     amount_of_shares: int
     price_per_share: Decimal
     created_at: datetime
+
+
+class OrderResponse(SQLModel):
+    user_id: uuid.UUID
+    order_type: str
+    amount_of_shares: int
+    price_per_share: Decimal
+    created_at: datetime

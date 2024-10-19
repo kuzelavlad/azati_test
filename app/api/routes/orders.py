@@ -1,10 +1,15 @@
-from fastapi import APIRouter
+import uuid
+
+from fastapi import APIRouter, HTTPException
 
 from datetime import datetime
 
+from sqlmodel import select
+
 from app.api.deps import SessionDep
 from app.orders.models import Order
-from app.orders.schemas import OrderCreate
+from app.orders.schemas import OrderCreate, OrderResponse
+from app.stocks.models import Stock
 
 router = APIRouter()
 
@@ -27,3 +32,28 @@ async def create_order(
     await session.commit()
     await session.refresh(new_order)
     return new_order
+
+
+@router.get("/{stock_id}", response_model=list[OrderResponse])
+async def get_orders(
+        session: SessionDep,
+        stock_id: uuid.UUID
+):
+    stock = await session.get(Stock, stock_id)
+    if stock is None:
+        raise HTTPException(status_code=404, detail="Stock not found")
+    result = await session.execute(select(Order).where(Order.stock_id == stock_id))
+    orders = result.scalars().all()
+
+    orders_response = [
+        OrderResponse(
+            user_id=order.user_id,
+            order_type=order.order_type,
+            amount_of_shares=order.amount_of_shares,
+            price_per_share=order.price_per_share,
+            created_at=order.created_at
+        )
+        for order in orders
+    ]
+
+    return orders_response
