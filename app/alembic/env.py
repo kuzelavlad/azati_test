@@ -17,6 +17,8 @@ fileConfig(config.config_file_name)
 
 from app.core.config import settings  # noqa
 from app.users.models import * # noqa
+from app.stocks.models import * # noqa
+from app.orders.models import * # noqa
 
 
 target_metadata = SQLModel.metadata
