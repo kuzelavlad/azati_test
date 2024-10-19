@@ -14,3 +14,4 @@ class User(SQLModel, table=True):
     username: str = Field(max_length=64, nullable=True, default=None)
     password: str = Field(max_length=64, nullable=True, default=None)
     auth_token: str = Field(max_length=64, nullable=True, default=None)
+    

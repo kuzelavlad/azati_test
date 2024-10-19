@@ -1,11 +1,12 @@
 import uuid
 from datetime import datetime
-from sqlmodel import SQLModel, Field, Relationship
+
+from sqlmodel import SQLModel, Field
 
 
-class Stocks(SQLModel, table=True):
+class Stock(SQLModel, table=True):
     id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     title: str = Field(max_length=64, nullable=False)
     created_at: datetime = Field(default_factory=datetime.now)
+    total_shares: int = Field(default=0, nullable=False)
 
-    orders: list["Order"] = Relationship(back_populates="stocks")
