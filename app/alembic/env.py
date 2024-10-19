@@ -16,6 +16,7 @@ config = context.config
 fileConfig(config.config_file_name)
 
 from app.core.config import settings  # noqa
+from app.users.models import * # noqa
 
 
 target_metadata = SQLModel.metadata
