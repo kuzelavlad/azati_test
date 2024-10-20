@@ -1,3 +1,4 @@
+import uuid
 from datetime import timedelta
 
 from fastapi import APIRouter, HTTPException
@@ -77,3 +78,19 @@ async def get_my_orders(session: SessionDep, current_user: CurrentUser):
     )
 
     return orders.scalars().all()
+
+
+@router.delete("/me/orders/{order_id}")
+async def cancel_order(session: SessionDep,order_id: uuid.UUID, current_user: CurrentUser):
+    query = select(Order).where(Order.id == order_id, Order.user_id == current_user.id)
+    order = await session.execute(query)
+    order = order.scalars().first()
+
+    if not order:
+        raise HTTPException(status_code=404,
+                            detail="Order not found or you do not have permission to cancel this order")
+
+    await session.delete(order)
+    await session.commit()
+
+    return {"msg": "Order cancelled successfully"}
