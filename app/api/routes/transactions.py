@@ -10,7 +10,7 @@ from app.transactions.schemas import TransactionResponse
 router = APIRouter()
 
 
-@router.get("/transactions", response_model=list[TransactionResponse])
+@router.get("/", response_model=list[TransactionResponse])
 async def get_transactions(session: SessionDep):
     result = await session.execute(select(Transaction))
     transactions = result.scalars().all()

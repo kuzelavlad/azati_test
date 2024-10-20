@@ -6,7 +6,7 @@ from sqlmodel import select
 
 from app.api.deps import SessionDep, CurrentUser
 from app.users.models import User
-from app.users.schemas import UserCreate, Token, UserLogin
+from app.users.schemas import UserCreate, Token, UserLogin, UserInfo
 from app.core.security import get_password_hash
 from app.users import services
 from app.core import security
@@ -58,6 +58,16 @@ async def login_user(session: SessionDep, data: UserLogin) -> Token:
         subject=str(user.id), expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type=settings.TOKEN_TYPE)
+
+
+@router.get("/me", response_model=UserInfo)
+async def get_user_info(current_user: CurrentUser):
+    return UserInfo(
+        first_name=current_user.first_name,
+        last_name=current_user.last_name,
+        is_active=current_user.is_active,
+        created_at=current_user.created_at
+    )
 
 
 @router.get("/me/orders", response_model=list[OrderResponse])
