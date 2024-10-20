@@ -1,8 +1,9 @@
 import uuid
 from datetime import datetime
 from decimal import Decimal
+
 from fastapi import APIRouter
-from sqlmodel import SQLModel, Field
+from sqlmodel import Field, SQLModel
 
 router = APIRouter()
 

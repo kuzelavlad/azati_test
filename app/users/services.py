@@ -6,7 +6,7 @@ from sqlmodel import select
 
 
 async def create_user(
-        *, session: AsyncSession, user: UserInfo, username: str, password: str
+    *, session: AsyncSession, user: UserInfo, username: str, password: str
 ) -> User:
     db_obj = User.model_validate(
         user,
@@ -29,7 +29,7 @@ async def get_user_by_username(*, session: AsyncSession, username: str) -> User 
 
 
 async def authenticate(
-        *, session: AsyncSession, username: str, password: str
+    *, session: AsyncSession, username: str, password: str
 ) -> User | None:
     user = await get_user_by_username(session=session, username=username)
     if not user or not verify_password(password, user.hashed_password):

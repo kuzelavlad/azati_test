@@ -1,9 +1,9 @@
 from datetime import datetime
-from sqlmodel import select
 
-from app.orders.models import Order
 from app.api.deps import SessionDep
+from app.orders.models import Order
 from app.transactions.models import Transaction
+from sqlmodel import select
 
 
 async def match_orders(session: SessionDep, new_order: Order):
@@ -23,7 +23,9 @@ async def match_orders(session: SessionDep, new_order: Order):
             if new_order.amount_of_shares == 0:
                 break
 
-            matched_shares = min(new_order.amount_of_shares, sell_order.amount_of_shares)
+            matched_shares = min(
+                new_order.amount_of_shares, sell_order.amount_of_shares
+            )
             total_price = matched_shares * sell_order.price_per_share
 
             transaction = Transaction(
@@ -33,7 +35,7 @@ async def match_orders(session: SessionDep, new_order: Order):
                 amount_of_shares=matched_shares,
                 price_per_share=sell_order.price_per_share,
                 total_price=total_price,
-                created_at=datetime.now()
+                created_at=datetime.now(),
             )
             session.add(transaction)
 
@@ -67,7 +69,7 @@ async def match_orders(session: SessionDep, new_order: Order):
                 amount_of_shares=matched_shares,
                 price_per_share=buy_order.price_per_share,
                 total_price=total_price,
-                created_at=datetime.now()
+                created_at=datetime.now(),
             )
             session.add(transaction)
 

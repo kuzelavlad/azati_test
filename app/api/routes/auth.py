@@ -1,21 +1,21 @@
 from datetime import timedelta
 from typing import Annotated
 
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, HTTPException, Depends
-
-
-from app.core import security
 from app.api.deps import SessionDep
+from app.core import security
 from app.core.config import settings
-from app.users.schemas import Token
 from app.users import services
+from app.users.schemas import Token
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter()
 
 
 @router.post("/token")
-async def get_auth_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep) -> Token:
+async def get_auth_token(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep
+) -> Token:
     user = await services.authenticate(
         session=session, username=form_data.username, password=form_data.password
     )
@@ -30,4 +30,3 @@ async def get_auth_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends
             user.id, expires_delta=access_token_expires
         )
     )
-

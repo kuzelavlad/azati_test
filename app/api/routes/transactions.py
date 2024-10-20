@@ -1,11 +1,8 @@
-from sqlmodel import select
-
-from fastapi import APIRouter
-
 from app.api.deps import SessionDep
 from app.transactions.models import Transaction
 from app.transactions.schemas import TransactionResponse
-
+from fastapi import APIRouter
+from sqlmodel import select
 
 router = APIRouter()
 
@@ -24,9 +21,8 @@ async def get_transactions(session: SessionDep):
                 buyer_id=transaction.buy_order_id,
                 amount_of_shares=transaction.amount_of_shares,
                 price_per_share=transaction.price_per_share,
-                total_price=transaction.total_price
+                total_price=transaction.total_price,
             )
         )
 
     return transaction_responses
-

@@ -1,6 +1,6 @@
-from sqlmodel import SQLModel
 from datetime import datetime
-from typing import Optional
+
+from sqlmodel import SQLModel
 
 
 class TokenPayload(SQLModel):
@@ -26,6 +26,6 @@ class UserLogin(SQLModel):
 
 class UserInfo(SQLModel):
     first_name: str
-    last_name: Optional[str]
+    last_name: str | None
     is_active: bool
     created_at: datetime

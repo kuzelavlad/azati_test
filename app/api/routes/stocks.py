@@ -1,24 +1,20 @@
-from fastapi import APIRouter
-
 from datetime import datetime
-
-from sqlmodel import select
 
 from app.api.deps import SessionDep
 from app.stocks.models import Stock
 from app.stocks.schemas import StockCreate
+from fastapi import APIRouter
+from sqlmodel import select
+
 router = APIRouter()
 
 
 @router.post("/create-stock")
-async def create_stock(
-        session: SessionDep,
-        create_data: StockCreate
-):
+async def create_stock(session: SessionDep, create_data: StockCreate):
     new_stock = Stock(
         title=create_data.title,
         total_shares=create_data.total_shares,
-        created_at=datetime.now()
+        created_at=datetime.now(),
     )
 
     session.add(new_stock)

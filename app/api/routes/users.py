@@ -1,26 +1,26 @@
 import uuid
 from datetime import timedelta
 
-from fastapi import APIRouter, HTTPException
-
-from sqlmodel import select
-
-from app.api.deps import SessionDep, CurrentUser
-from app.users.models import User
-from app.users.schemas import UserCreate, Token, UserLogin, UserInfo
-from app.core.security import get_password_hash
-from app.users import services
+from app.api.deps import CurrentUser, SessionDep
 from app.core import security
 from app.core.config import settings
-from app.orders.schemas import OrderResponse
+from app.core.security import get_password_hash
 from app.orders.models import Order
+from app.orders.schemas import OrderResponse
+from app.users import services
+from app.users.models import User
+from app.users.schemas import Token, UserCreate, UserInfo, UserLogin
+from fastapi import APIRouter, HTTPException
+from sqlmodel import select
 
 router = APIRouter()
 
 
 @router.post("/register")
 async def register_user(user_data: UserCreate, session: SessionDep):
-    existing_user = await session.execute(select(User).where(User.username == user_data.username))
+    existing_user = await session.execute(
+        select(User).where(User.username == user_data.username)
+    )
     if existing_user.scalars().first():
         raise HTTPException(status_code=400, detail="Username already registered")
 
@@ -29,7 +29,7 @@ async def register_user(user_data: UserCreate, session: SessionDep):
         hashed_password=get_password_hash(user_data.password),
         first_name=user_data.first_name,
         last_name=user_data.last_name,
-        is_active=True
+        is_active=True,
     )
 
     session.add(new_user)
@@ -46,7 +46,9 @@ async def login_user(session: SessionDep, data: UserLogin) -> Token:
     )
 
     if not user:
-        raise HTTPException(status_code=401, detail="Incorrect username or password")  # Исправлено
+        raise HTTPException(
+            status_code=401, detail="Incorrect username or password"
+        )  # Исправлено
 
     if not user.is_active:
         raise HTTPException(status_code=401, detail="Inactive user")
@@ -67,7 +69,7 @@ async def get_user_info(current_user: CurrentUser):
         first_name=current_user.first_name,
         last_name=current_user.last_name,
         is_active=current_user.is_active,
-        created_at=current_user.created_at
+        created_at=current_user.created_at,
     )
 
 
@@ -81,14 +83,18 @@ async def get_my_orders(session: SessionDep, current_user: CurrentUser):
 
 
 @router.delete("/me/orders/{order_id}")
-async def cancel_order(session: SessionDep,order_id: uuid.UUID, current_user: CurrentUser):
+async def cancel_order(
+    session: SessionDep, order_id: uuid.UUID, current_user: CurrentUser
+):
     query = select(Order).where(Order.id == order_id, Order.user_id == current_user.id)
     order = await session.execute(query)
     order = order.scalars().first()
 
     if not order:
-        raise HTTPException(status_code=404,
-                            detail="Order not found or you do not have permission to cancel this order")
+        raise HTTPException(
+            status_code=404,
+            detail="Order not found or you do not have permission to cancel this order",
+        )
 
     await session.delete(order)
     await session.commit()

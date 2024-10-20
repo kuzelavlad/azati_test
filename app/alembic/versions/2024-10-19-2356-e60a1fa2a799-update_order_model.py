@@ -5,7 +5,8 @@ Revises: 1adb255ae9bd
 Create Date: 2024-10-19 23:56:57.210936
 
 """
-from typing import Sequence, Union
+from typing import Union
+from collections.abc import Sequence
 
 from alembic import op
 import sqlalchemy as sa
@@ -13,9 +14,9 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = 'e60a1fa2a799'
-down_revision: Union[str, None] = '1adb255ae9bd'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = '1adb255ae9bd'
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade():

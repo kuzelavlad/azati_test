@@ -5,7 +5,8 @@ Revises: e60a1fa2a799
 Create Date: 2024-10-20 00:02:45.928345
 
 """
-from typing import Sequence, Union
+from typing import Union
+from collections.abc import Sequence
 
 from alembic import op
 import sqlalchemy as sa
@@ -13,9 +14,9 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = '0fde739396dc'
-down_revision: Union[str, None] = 'e60a1fa2a799'
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = 'e60a1fa2a799'
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade():

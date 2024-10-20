@@ -1,10 +1,9 @@
-from sqlmodel import SQLModel
 from datetime import datetime
 
-from typing import Optional
+from sqlmodel import SQLModel
 
 
 class StockCreate(SQLModel):
     title: str
     total_shares: int
-    created_at: Optional[datetime] = None
+    created_at: datetime | None = None

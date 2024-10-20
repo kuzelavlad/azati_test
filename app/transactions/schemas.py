@@ -1,7 +1,7 @@
 import uuid
+from decimal import Decimal
 
 from sqlmodel import SQLModel
-from decimal import Decimal
 
 
 class TransactionResponse(SQLModel):

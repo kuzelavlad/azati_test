@@ -1,21 +1,18 @@
-import jwt
-
 from collections.abc import AsyncIterator
 from typing import Annotated
 
+import jwt
+from app.core import security
+from app.core.config import settings
+from app.users.models import User
+from app.users.schemas import TokenPayload
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
-
-from app.users.models import User
-from app.core import security
-from app.core.config import settings
-from fastapi import Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from app.users.schemas import TokenPayload
-
-async_engine = create_async_engine(settings.SQLALCHEMY_DATABASE_URI, echo=True)
+async_engine = create_async_engine(settings.sqlalchemy_database_uri, echo=True)
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/token")
 
 
@@ -56,5 +53,6 @@ async def get_current_user(session: SessionDep, token: TokenDep) -> type[User]:
     if not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return user
+
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
