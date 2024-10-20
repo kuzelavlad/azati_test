@@ -19,6 +19,7 @@ from app.core.config import settings  # noqa
 from app.users.models import * # noqa
 from app.stocks.models import * # noqa
 from app.orders.models import * # noqa
+from app.transactions.models import * # noqa
 
 
 target_metadata = SQLModel.metadata

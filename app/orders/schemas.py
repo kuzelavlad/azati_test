@@ -11,7 +11,6 @@ class OrderCreate(SQLModel):
     order_type: str
     amount_of_shares: int
     price_per_share: Decimal
-    created_at: datetime
 
 
 class OrderResponse(SQLModel):

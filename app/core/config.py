@@ -27,6 +27,8 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = os.getenv('SECRET_KEY')
     DOMAIN: str = "localhost:8000"
+    TOKEN_TYPE: str = "bearer"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
     BASE_PATH: PosixPath = Path(__file__).resolve().parent.parent.parent
     APP_DIR: PosixPath = BASE_PATH / "app"

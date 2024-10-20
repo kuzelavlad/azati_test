@@ -12,6 +12,4 @@ class User(SQLModel, table=True):
     is_blocked: bool = False
     is_superuser: bool = False
     username: str = Field(max_length=64, nullable=True, default=None)
-    password: str = Field(max_length=64, nullable=True, default=None)
-    auth_token: str = Field(max_length=64, nullable=True, default=None)
-    
+    hashed_password: str = Field(max_length=64, nullable=True, default=None)

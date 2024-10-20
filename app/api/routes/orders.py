@@ -9,6 +9,7 @@ from sqlmodel import select
 from app.api.deps import SessionDep
 from app.orders.models import Order
 from app.orders.schemas import OrderCreate, OrderResponse
+from app.orders.services import match_orders
 from app.stocks.models import Stock
 
 router = APIRouter()
@@ -26,11 +27,15 @@ async def create_order(
         amount_of_shares=create_data.amount_of_shares,
         price_per_share=create_data.price_per_share,
         created_at=datetime.now()
-
     )
+
     session.add(new_order)
+
+    await match_orders(session, new_order)
+
     await session.commit()
     await session.refresh(new_order)
+
     return new_order
 
 

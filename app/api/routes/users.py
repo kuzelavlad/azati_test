@@ -1,62 +1,69 @@
-import uuid
-from datetime import datetime
+from datetime import timedelta
 
 from fastapi import APIRouter, HTTPException
+
 from sqlmodel import select
 
-from app.api.deps import SessionDep
+from app.api.deps import SessionDep, CurrentUser
 from app.users.models import User
-from app.users.schemas import UserCreate, UserInfo
+from app.users.schemas import UserCreate, Token, UserLogin
+from app.core.security import get_password_hash
+from app.users import services
+from app.core import security
+from app.core.config import settings
+from app.orders.schemas import OrderResponse
+from app.orders.models import Order
 
 router = APIRouter()
 
 
-@router.post("/create-user")
-async def create_user(
-        session: SessionDep,
-        create_data: UserCreate
-):
+@router.post("/register")
+async def register_user(user_data: UserCreate, session: SessionDep):
+    existing_user = await session.execute(select(User).where(User.username == user_data.username))
+    if existing_user.scalars().first():
+        raise HTTPException(status_code=400, detail="Username already registered")
+
     new_user = User(
-        first_name=create_data.first_name,
-        last_name=create_data.last_name,
-        is_active=create_data.is_active,
-        is_superuser=create_data.is_superuser,
-        is_blocked=create_data.is_blocked,
-        created_at=datetime.now()
+        username=user_data.username,
+        hashed_password=get_password_hash(user_data.password),
+        first_name=user_data.first_name,
+        last_name=user_data.last_name,
+        is_active=True
     )
 
     session.add(new_user)
     await session.commit()
     await session.refresh(new_user)
-    return new_user
+
+    return {"msg": "User registered successfully"}
 
 
-@router.get("/", response_model=list[User])
-async def get_users(
-        session: SessionDep,
-):
-    result = await session.execute(select(User))
-    users = result.scalars().all()
-    return users
-
-
-@router.get("/{user_id}", response_model=UserInfo)
-async def get_user_info(
-        session: SessionDep,
-        user_id: uuid.UUID
-):
-    result = await session.execute(
-        select(User)
-        .where(User.id == user_id)
+@router.post("/login", response_model=Token)
+async def login_user(session: SessionDep, data: UserLogin) -> Token:
+    user = await services.authenticate(
+        session=session, username=data.username, password=data.password
     )
-    user = result.scalar_one_or_none()
 
     if not user:
-        raise HTTPException(status_code=404, detail="User not found")
+        raise HTTPException(status_code=401, detail="Incorrect username or password")  # Исправлено
 
-    return UserInfo(
-        first_name=user.first_name,
-        last_name=user.last_name,
-        is_active=user.is_active,
-        created_at=user.created_at,
+    if not user.is_active:
+        raise HTTPException(status_code=401, detail="Inactive user")
+
+    if user.is_blocked:
+        raise HTTPException(status_code=403, detail="User is blocked")
+
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = security.create_access_token(
+        subject=str(user.id), expires_delta=access_token_expires
     )
+    return Token(access_token=access_token, token_type=settings.TOKEN_TYPE)
+
+
+@router.get("/me/orders", response_model=list[OrderResponse])
+async def get_my_orders(session: SessionDep, current_user: CurrentUser):
+    orders = await session.execute(
+        select(Order).where(Order.user_id == current_user.id)
+    )
+
+    return orders.scalars().all()
