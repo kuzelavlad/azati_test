@@ -7,8 +7,6 @@ from starlette.middleware.cors import CORSMiddleware
 app = FastAPI(
     title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
 )
-# admin = get_admin(app=app, engine=async_engine)
-# app.mount("/static", StaticFiles(directory=settings.STATIC_PATH), name="static")
 
 app.add_middleware(
     CORSMiddleware,
